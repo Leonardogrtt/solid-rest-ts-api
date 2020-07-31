@@ -1,6 +1,7 @@
 import { IUsersRepository } from "../../repositories/IUserRepository";
 import { ICreateUserRequestDTO } from "./CreateUserDTO";
 import { User } from "../../entities/User";
+import { IMailProvider } from "../../providers/IMailProvider";
 
 export class CreateUserUseCase {
      // -1- private usersRepository: IUsersRepository
@@ -9,7 +10,9 @@ export class CreateUserUseCase {
           // 1 2 3!
 
           // so(L)id - LISKOV SUBSTITUTION PRINCIPLE
-          private userRepository: IUsersRepository
+          private userRepository: IUsersRepository,
+          
+          private mailProvider: IMailProvider,
 
 
      ) {/* -3- this.userRepository = usersRepository */}
@@ -25,7 +28,19 @@ export class CreateUserUseCase {
           const user = new User(data);
 
           await this.userRepository.save(user);
-     }
 
+          this.mailProvider.sendMail({
+               to: {
+                    name: data.name,
+                    email: data.email,
+               },
+               from: {
+                    name: 'Equipe do Meu App',
+                    email: 'equipe@meuapp.com',
+               },
+               subject: 'Seja bem-vindo à plataforma',
+               body: '<p>Você já pode fazer login em nossa plataforma.</p>'
+          })
+     }
 
 }
